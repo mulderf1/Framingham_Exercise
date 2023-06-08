@@ -52,3 +52,4 @@ tQuantile <- qt(p = 0.975, df =  n - 1)
 lowerCI_mean_GLU <- mean_GLUC - tQuantile * SE_GLU
 upperCI_mean_GLU <- mean_GLUC + tQuantile * SE_GLU
 cbind(mean_GLUC, lowerCI_mean_GLU, upperCI_mean_GLU)
+
