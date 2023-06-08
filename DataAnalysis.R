@@ -53,3 +53,11 @@ lowerCI_mean_GLU <- mean_GLUC - tQuantile * SE_GLU
 upperCI_mean_GLU <- mean_GLUC + tQuantile * SE_GLU
 cbind(mean_GLUC, lowerCI_mean_GLU, upperCI_mean_GLU)
 
+#boxplot
+framingham <- framingham  |> 
+  mutate(DIABETES =factor(DIABETES, levels=c(0,1),labels=c("not diabetic","diabetic")))
+boxplot(framingham$GLUCOSE ~ framingham$DIABETES, xlab = "",
+        ylab = "Glucose")
+ggplot(framingham, aes(y=GLUCOSE, groups=DIABETES)) + 
+  geom_boxplot() +
+  scale_x_discrete()
