@@ -1,0 +1,170 @@
+---
+title: "DataAnalysis_finalreport"
+author: "Fanny Mulder"
+editor: visual
+format: 
+  html:
+    self-contained: true
+    code-link: true
+    code-fold: true
+    code-summary: "Answer"
+---
+
+## Having a high glucose concentration increse the risk of having diabetes - the Fringham study
+
+```{r}
+#| output: false  
+library(gitcreds)
+library(unibeCols)
+library(usethis)
+library(riskCommunicator)
+library(tidyverse)
+library(knitr)
+library(rstatix)
+data("framingham")
+library(here)
+```
+
+In this study we will evaluate the correlation between glucose values and the risk of diabetes.
+
+## Descriptive statistics
+
+In this section, descriptive statistics will be displayed to better understand the risk of glucose on diabetes.
+
+```{r}
+sum(framingham$GLUCOSE)
+sum(is.na(framingham$GLUCOSE))
+sum(framingham$GLUCOSE, na.rm = TRUE) / sum(!is.na(framingham$GLUCOSE))
+mean_GLUC <- mean(framingham$GLUCOSE, na.rm = TRUE)
+sorted_GLU <- sort(framingham$GLUCOSE)
+sum(is.na(sorted_GLU))
+length(sorted_GLU)
+mean_GLUC <- mean(framingham$GLUCOSE, na.rm =  TRUE)
+middle_GLU <- (length(sorted_GLU) + 1) / 2
+sorted_GLU[middle_GLU]
+median_GLU <- median(framingham$GLUCOSE, na.rm =  TRUE) 
+quart_GLU <- quantile(framingham$GLUCOSE, probs = c(0.25, 0.5, 0.75),
+                      na.rm = TRUE)
+sum((framingham$GLUCOSE - mean_GLUC) ^ 2, na.rm =  TRUE) / 
+  (sum(!is.na(framingham$GLUCOSE)) - 1)
+var(framingham$GLUCOSE, na.rm =  TRUE) 
+sqrt(var(framingham$GLUCOSE, na.rm =  TRUE))
+sd_GLU <- sd(framingham$GLUCOSE, na.rm =  TRUE) 
+max_GLU <- max(framingham$GLUCOSE, na.rm = T)
+min_GLU <- min(framingham$GLUCOSE, na.rm = TRUE)
+range(framingham$GLUCOSE, na.rm = TRUE)
+IQR(framingham$GLUCOSE, na.rm = TRUE) 
+```
+
+```{r}
+summary(framingham$GLUCOSE)
+```
+
+
+
+
+
+
+
+### Histogram of the distribution of the glucose 
+```{r}
+ggplot(framingham, aes(x = GLUCOSE)) + geom_histogram(binwidth = 5) +
+  geom_vline(xintercept = mean_GLUC, colour = "red") + geom_vline(xintercept = median_GLU, colour = "blue")
+```
+
+## Calculate the 95% confidence interval (CI) for the mean glucose value
+
+```{r}
+SE_GLU <- sd_GLU / sqrt(length(which(!is.na(framingham$GLUCOSE))))
+zValue <- qnorm(0.975)                        
+lowerCI_mean_GLU <- mean_GLUC - zValue * SE_GLU
+upperCI_mean_GLU <- mean_GLUC + zValue * SE_GLU
+cbind(mean_GLUC, lowerCI_mean_GLU, upperCI_mean_GLU)                               
+n <- length(which(!is.na(framingham$GLUCOSE)))
+tQuantile <- qt(p = 0.975, df =  n - 1)
+lowerCI_mean_GLU <- mean_GLUC - tQuantile * SE_GLU
+upperCI_mean_GLU <- mean_GLUC + tQuantile * SE_GLU
+```
+
+## Gaphical comparison in the glucose value between diabetic and non-diabetic
+```{r}
+framingham <- framingham |> mutate(DIABETES =factor(DIABETES, levels=c(0,1),labels=c("non diabetic","diabetic")))
+
+ggplot(framingham, aes(y=GLUCOSE, x=DIABETES)) + 
+  geom_boxplot()
+```
+We can see that value of glucose in non diabetic is lower than the one of the diabetic. There is larger distribution in the diabetic population than in the non diabetic population. 
+
+## Non-normality 
+
+```{r}
+head(framingham,5) |>
+  kable()
+```
+
+### Histogram of glucose value 
+```{r}
+framingham %>%
+  ggplot(aes(GLUCOSE)) +
+  geom_histogram(bins = 100,
+                 color = "black",
+                 fill = "steelblue") +
+  theme_bw()
+```
+
+### Quantile-quantile plot
+This quantile-quantile plot will allow us to assess the alignement and the theorical ligns. 
+
+```{r}
+framingham %>%
+  ggplot(aes(sample = GLUCOSE)) + 
+  geom_qq_line(distribution = stats::qnorm) +
+  geom_qq(color = "steelblue", distribution = stats::qnorm) + 
+  xlab("Theoretical Quantiles") +
+  ylab("Sample Quantiles") +
+  theme_bw()
+```
+
+We can see that the distribution is not normal.
+
+```{r}
+ks.test(framingham$GLUCOSE, "pnorm")
+```
+
+The distribution is not normal and there is a strong evidence against the null hypothesis. 
+
+## Logarithmic function 
+
+```{r}
+framingham <- framingham |> 
+  mutate(logGluc = log(GLUCOSE))
+
+ggplot(framingham, aes(x=logGluc)) + geom_histogram(bins = 100,
+                 color = "black",
+                 fill = "steelblue")
+```
+
+```{r}
+framingham |>
+  ggplot(aes(sample = logGluc)) + 
+  geom_qq_line(distribution = stats::qnorm) +
+  geom_qq(color = "steelblue", distribution = stats::qnorm) + 
+  xlab("Theoretical Quantiles") +
+  ylab("Sample Quantiles") +
+  theme_bw()
+```
+
+```{r}
+ks.test(framingham$logGluc, "pnorm")
+```
+Here again, the distribution is not normal and there is a strong evidence against the null hypothesis.
+
+## Calculation if the mean glucose value differs between diabetics and non-diabetics.
+
+```{r}
+framingham %>%
+  wilcox_test(GLUCOSE ~ DIABETES) %>%
+  kable()
+```
+
+The difference between the means of the glucose values shows a strong evidence about having diabetes. 
