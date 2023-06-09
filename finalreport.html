@@ -3046,7 +3046,7 @@ vertical-align: -.125em;
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://here.r-lib.org/">here</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>In this study we will evaluate the correlation between glucose values and the risk of diabetes.</p>
+<p>In this study we will evaluate the correlation between glucose values and the risk of diabetes. We will first look at descriptive statistics of glucose in the framingham population such as the mean, the median, the 1st and the 3rd quartile. After this we will make the histogram of the distribution. We will also calculate the 95% interval for the mena of the glucose value. Then we want to analyse, if diabetic have another glucose value thant non-diabetic. Is the ditribution of the glucose value normal ? Is it there is a strong evidence against the null hypothesis ?</p>
 </section><section id="descriptive-statistics" class="level2"><h2 class="anchored" data-anchor-id="descriptive-statistics">Descriptive statistics</h2>
 <p>In this section, descriptive statistics will be displayed to better understand the risk of glucose on diabetes.</p>
 <div class="cell">
@@ -3506,6 +3506,7 @@ alternative hypothesis: two-sided</code></pre>
 </div>
 <p>The distribution is not normal and there is a strong evidence against the null hypothesis.</p>
 </section></section><section id="logarithmic-function" class="level2"><h2 class="anchored" data-anchor-id="logarithmic-function">Logarithmic function</h2>
+<p>We are doing the logarithmic function to see, if with this function, it is normally distributed.</p>
 <div class="cell">
 <details><summary>Code</summary><div class="sourceCode" id="cb42"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">framingham</span> <span class="op">&lt;-</span> <span class="va">framingham</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>logGluc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">GLUCOSE</span><span class="op">)</span><span class="op">)</span></span>
